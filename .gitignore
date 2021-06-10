@@ -1,23 +1,99 @@
-# Compiled class file
-*.class
+package com.example.game;
 
-# Log file
-*.log
+import androidx.appcompat.app.AppCompatActivity;
 
-# BlueJ files
-*.ctxt
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+public class MainActivity extends AppCompatActivity {
+    boolean gameActive = true;
+    //player Representation
+    //0-x
+    //1-0
+    int activePlayer = 0;
+    int[] gamestate = {2, 2, 2, 2, 2, 2, 2, 2, 2};
+    // state meanings:
+    //0 - x
+    //1 - 0
+    //2 - null
+    int[][] winpositions = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 4, 8}, {6, 4, 2}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}};
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+    public void taptap(View view) {
+        ImageView img = (ImageView) view;
+        int tappedImage = Integer.parseInt(img.getTag().toString());
+        if (!gameActive) {
+            gameReset(view);
+        }
+        if (gamestate[tappedImage] == 2 && gameActive) {
+            gamestate[tappedImage] = activePlayer;
+            img.setTranslationY(-1000f);
+            if (activePlayer == 0) {
+                img.setImageResource(R.drawable.x);
+                activePlayer = 1;
+                TextView status = findViewById(R.id.status);
+                status.setText("o's turn tap-to-play");
+            } else {
+                img.setImageResource(R.drawable.a);
+                TextView status = findViewById(R.id.status);
+                status.setText("x's turn tap-to-play");
+                activePlayer = 0;
+            }
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+            img.animate().translationYBy(1000f).setDuration(300);
+        }
+        // check if any player is won
+        for (int[] winpossition : winpositions) {
+            if (gamestate[winpossition[0]] == gamestate[winpossition[1]] &&
+                    gamestate[winpossition[1]] == gamestate[winpossition[2]] &&
+                    gamestate[winpossition[0]] != 2) {
+                //some body has won- who will won?
+                String winnerstr;
+                gameActive = false;
+                if (gamestate[winpossition[0]] == 0) {
+                    winnerstr = "X has won";
+                } else {
+                    winnerstr = "O has won";
+                }
+                // update the status bar for winner anonuncement
+                TextView status = findViewById(R.id.status);
+                status.setText(winnerstr);
+            }
+
+        }
+    }
+
+    public void gameReset(View view) {
+        gameActive = true;
+        activePlayer = 0;
+        for (int i = 0; i < gamestate.length; i++) {
+            gamestate[i] = 2;
+        }
+
+
+
+
+
+        ((ImageView) findViewById(R.id.imageView1)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView2)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView3)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView4)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView5)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView6)).setImageResource(0);
+        ((ImageView) findViewById(R.id.imageView7)).setImageResource(0);
+        TextView status = findViewById(R.id.status);
+        status.setText("x's turn tap-to-play");
+    }
+
+
+
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
